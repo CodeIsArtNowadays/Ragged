@@ -1,0 +1,13 @@
+documents 
+   ↓
+split 
+   ↓
+embed 
+   ↓
+store vectors 
+   ↓
+retrieve relevant chunks
+   ↓
+assemble prompt
+   ↓
+LLM answers using context
