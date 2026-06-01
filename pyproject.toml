@@ -5,8 +5,16 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
+    "fastapi>=0.136.3",
     "loguru>=0.7.3",
     "numpy>=2.4.6",
     "openai>=2.38.0",
+    "pydantic-settings>=2.14.1",
     "sentence-transformers>=5.5.1",
+    "sqlalchemy>=2.0.50",
+    "uvicorn>=0.48.0",
 ]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
