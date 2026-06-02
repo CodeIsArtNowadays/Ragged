@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
 
+from src.core.dependencies import get_user
+from src.auth.models import UserModel
 from src.auth.service import UserService
-from src.auth.schemas import UserCredentialsSchema, UserLoginResponseSchema
+from src.auth.schemas import UserCredentialsSchema, UserLoginResponseSchema, UserBaseSchema
 from src.auth.registration import RegistrationUseCase
 from src.auth.dependencies import get_user_service
 
@@ -24,3 +26,7 @@ async def login(
 ):
     token = await user_service.login(user_data)
     return UserLoginResponseSchema(jwt_token=token)
+
+@auth_router.get('/me', response_model=UserBaseSchema)
+async def me(user: UserModel = Depends(get_user)):
+    return user
