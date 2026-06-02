@@ -1,5 +1,8 @@
+import jwt
+
 from pwdlib import PasswordHash
 
+from config import settings
 from src.auth.repository import UserRepository
 from src.auth.schemas import UserCredentialsSchema
 from src.auth.exceptions import UserException
@@ -29,7 +32,8 @@ class UserService:
             raise UserException
 
         payload = {
-            'user_id': user.id
+            'user_id': user.id,
+            'username': user.username
         }
         return await self.create_jwt_token(payload)
 
@@ -37,4 +41,7 @@ class UserService:
         return self.hashier.verify(password, hashed_password)
 
     async def create_jwt_token(self, payload):
-        pass
+        return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm='HS256')
+
+    async def decode_jwt_token(self, token):
+        return jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
