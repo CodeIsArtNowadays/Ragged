@@ -13,6 +13,7 @@ class MemberModel(Base):
     __tablename__ = 'members'
 
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), primary_key=True)
+    username: Mapped[str] = mapped_column()
 
     workspaces: Mapped[List['WorkspaceMember']] = relationship('WorkspaceMember', back_populates='user')
     documents: Mapped[List['DocumentModel']] = relationship('DocumentModel', back_populates='author')

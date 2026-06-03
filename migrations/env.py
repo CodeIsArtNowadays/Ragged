@@ -10,7 +10,7 @@ from alembic import context
 from config import settings
 from src.core.db import Base
 from src.auth.models import UserModel
-from src.api.models import DocumentModel, MemberModel, WorkspaceMember, WorkspaceModel
+from src.workspaces.models import DocumentModel, MemberModel, WorkspaceMember, WorkspaceModel
 
 def get_url():
     return settings.async_db_url

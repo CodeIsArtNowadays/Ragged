@@ -26,7 +26,7 @@ class RegistrationUseCase:
         user = await self.user_service.create_user(user_data)
 
         # Create member w/ user_id
-        await self.member_repo.create(MemberCreateSchema(user_id=user.id))
+        await self.member_repo.create(MemberCreateSchema(user_id=user.id, username=user.username))
         
         # Login user
         jwt_token = await self.user_service.login(credentials)
