@@ -43,3 +43,10 @@ class AddMemberToWorkspaceSchema(BaseModel):
 class WorkspaceReprSchema(WorkspaceBaseSchema):
 
     members: List[MemberCreateSchema]
+
+
+class ChangeMemberRole(BaseModel):
+    workspace_id: int
+    member_id: int
+    user_id: int
+    role: RoleLiteral

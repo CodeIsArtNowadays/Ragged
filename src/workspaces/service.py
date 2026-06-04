@@ -1,14 +1,21 @@
 from loguru import logger
 
 from src.workspaces.models import MemberModel
-from src.workspaces.schemas import WorkspaceCreateRequestSchema, WorkspaceMemberCreateSchema, AddMemberToWorkspaceSchema, WorkspaceReprSchema, MemberCreateSchema
+from src.workspaces.schemas import (
+    WorkspaceCreateRequestSchema,
+    WorkspaceMemberCreateSchema,
+    AddMemberToWorkspaceSchema,
+    WorkspaceReprSchema,
+    MemberCreateSchema,
+    ChangeMemberRole
+)
 from src.workspaces.repository import WorkspaceRepository, WorkspaceMemberRepository
 
 
 class WorkspaceService:
 
     def __init__(
-        self, 
+        self,
         workspace_repo: WorkspaceRepository,
         workspace_member_repo: WorkspaceMemberRepository
     ):
@@ -26,7 +33,7 @@ class WorkspaceService:
         return await self.workspace_member_repo.member_role(workspace_id, member_id)
 
     async def add_member_to_workspace(
-        self, 
+        self,
         workspace_id,
         member_from_request: MemberModel,
         member_data: AddMemberToWorkspaceSchema
@@ -34,10 +41,10 @@ class WorkspaceService:
         role = await self.get_member_role(workspace_id, member_from_request.user_id)
         if role != 'owner':
              logger.error('Owner only')
-             raise Exception 
+             raise Exception
 
         member_workspace_data = WorkspaceMemberCreateSchema(
-            workspace_id=workspace_id, 
+            workspace_id=workspace_id,
             user_id=member_data.user_id,
             role=member_data.role
         )
@@ -66,4 +73,15 @@ class WorkspaceService:
             raise Exception
         await self.workspace_member_repo.delete_by_user_id(workspace_id, member_id)
         return True
-    
+
+    async def change_member_role(self, change_role_data: ChangeMemberRole):
+        user_role = await self.get_member_role(change_role_data.workspace_id, change_role_data.user_id)
+        if not user_role == 'owner':
+            logger.error('Permission denied')
+            raise Exception
+
+        return await self.workspace_member_repo.change_member_role(
+            change_role_data.workspace_id,
+            change_role_data.member_id,
+            change_role_data.role
+        )

@@ -1,7 +1,9 @@
+from loguru import logger
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select, delete
 
 from src.core.generic_repository import BaseRepository
+from src.core.custom_types import RoleLiteral
 from src.workspaces.models import MemberModel
 from src.workspaces.models import WorkspaceModel, WorkspaceMember
 
@@ -39,4 +41,17 @@ class WorkspaceMemberRepository(BaseRepository):
     async def delete_by_user_id(self, workspace_id: int, member_id: int):
         stmt = delete(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace_id, WorkspaceMember.user_id == member_id)
         await self.session.execute(stmt)
+
+    async def change_member_role(self, workspace_id: int, member_id: int, role: RoleLiteral):
+        stmt = select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace_id, WorkspaceMember.user_id == member_id)
+        res = await self.session.execute(stmt)
+        mu = res.scalar_one()
+        if not mu:
+            logger.error('No member')
+        mu.role = role
+        await self.session.flush()
+        await self.session.refresh(mu)
+        return mu
+
+    
         
