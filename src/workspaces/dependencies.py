@@ -41,11 +41,11 @@ class Permission:
 
     async def __call__(
         self, 
-        id: int,
+        workspace_id: int,
         wm_repo: WorkspaceMemberRepository = Depends(get_workspace_member_repo),
         member: MemberModel = Depends(get_member)
     ):
-        member_role = await wm_repo.member_role(id, member.user_id)
+        member_role = await wm_repo.member_role(workspace_id, member.user_id)
         if member_role not in self.roles:
             logger.error('Permission Denied')
             raise PermissionDeniedException

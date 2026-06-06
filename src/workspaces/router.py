@@ -37,29 +37,29 @@ async def create_workspace(
 
 @workspaces_router.get('/{id}', response_model=WorkspaceReprSchema)
 async def get_workspace(
-    id: int, 
+    workspace_id: int, 
     user: MemberModel = Depends(Permission(['owner', 'admin', 'member'])),
     workspace_service: WorkspaceService = Depends(get_workspace_service)
 ):
-    return await workspace_service.get_workspace(id, user.user_id)
+    return await workspace_service.get_workspace(workspace_id, user.user_id)
 
 @workspaces_router.patch('/{id}')
 async def add_member_to_workspace(
-    id: int,
+    workspace_id: int,
     member_to_add: AddMemberToWorkspaceSchema,
     user: MemberModel = Depends(Permission(['owner'])),
     workspace_service: WorkspaceService = Depends(get_workspace_service)
 ):
-    return await workspace_service.add_member_to_workspace(id, user, member_to_add)
+    return await workspace_service.add_member_to_workspace(workspace_id, user, member_to_add)
 
 @workspaces_router.delete('/{id}/members')
 async def kick_member(
-    id: int, 
+    workspace_id: int, 
     member_to_kick_id: int = Body(embed=True), 
     user: MemberModel = Depends(Permission(['owner'])), 
     workspace_service: WorkspaceService = Depends(get_workspace_service)
 ):
-    if await workspace_service.kick_member(id, user.user_id, member_to_kick_id):
+    if await workspace_service.kick_member(workspace_id, user.user_id, member_to_kick_id):
         return {'status': 204}
     raise Exception # todo refactor to get_member_by_id
     
