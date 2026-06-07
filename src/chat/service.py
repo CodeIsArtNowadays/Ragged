@@ -21,5 +21,7 @@ class ConnectionManager:
            for connection in self.active_connections[id]:
                await connection.send_text(message)
 
+    async def verify_auth(self, id: int, token: str):
+        pass
 
 websocket_manager = ConnectionManager()
