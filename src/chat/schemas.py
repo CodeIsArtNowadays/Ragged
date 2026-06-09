@@ -7,3 +7,4 @@ class ChannelSchema(BaseModel):
 class MessageSchema(BaseModel):
     text: str
     author_id: int
+    channel_id: int
