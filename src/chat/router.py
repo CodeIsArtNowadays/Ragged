@@ -3,8 +3,8 @@ from fastapi.websockets import WebSocketDisconnect
 
 from src.auth.dependencies import get_user_service
 from src.auth.service import UserService
-from src.chat.dependencies import PaginationParams, get_channel_repo, get_message_repo
-from src.chat.repository import ChannelRepository, MessageRepository
+from src.chat.dependencies import PaginationParams, get_message_repo
+from src.chat.repository import MessageRepository
 from src.chat.schemas import MessageSchema, MessageResponseSchema
 from src.chat.service import websocket_manager
 from src.chat.utils import get_member_by_token, verify_membership
@@ -17,6 +17,7 @@ from src.workspaces.models import MemberModel
 from src.workspaces.repository import MemberRepository
 from src.workspaces.service import WorkspaceService
 
+
 chat_router = APIRouter(prefix="/{workspace_id}")
 
 
@@ -25,12 +26,10 @@ async def channel(
     workspace_id: int,
     user: MemberModel = Depends(Permission(["owner", "admin", "member"])),
     pagination: PaginationParams = Depends(),
-    channel_repo: ChannelRepository = Depends(get_channel_repo),
     message_repo: MessageRepository = Depends(get_message_repo),
 ):
-    channel = await channel_repo.get_or_create(workspace_id)
-    return await message_repo.get_messages_by_channel_id(
-        channel.id, pagination.size, pagination.cursor
+    return await message_repo.get_messages_by_workspace_id(
+        workspace_id, pagination.size, pagination.cursor
     )
 
 @chat_router.websocket("/channel")
@@ -40,7 +39,6 @@ async def ws_handler(
     user_service: UserService = Depends(get_user_service),
     member_repo: MemberRepository = Depends(get_member_repo),
     workspace_service: WorkspaceService = Depends(get_workspace_service),
-    channel_repo: ChannelRepository = Depends(get_channel_repo),
     message_repo: MessageRepository = Depends(get_message_repo),
 ):
     await websocket.accept()
@@ -50,7 +48,6 @@ async def ws_handler(
             member = await get_member_by_token(
                 data["content"]["token"], user_service, member_repo
             )
-            channel = await channel_repo.get_or_create(workspace_id)
 
             if await verify_membership(workspace_id, member.user_id, workspace_service):
                 await websocket_manager.connect(workspace_id, websocket)
@@ -63,7 +60,7 @@ async def ws_handler(
                         message = MessageSchema(
                             text=message_raw,
                             author_id=member.user_id,
-                            channel_id=channel.id,
+                            workspace_id=workspace_id,
                         )
                         message = await message_repo.create(message)
                         message_response = MessageResponseSchema.model_validate(message)
