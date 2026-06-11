@@ -19,7 +19,9 @@ class DocumentService:
             workspace_id=workspace_id,
             url=file_path
         )
-        return await self.repo.create(document_data)
+        document = await self.repo.create(document_data)
+        await self.repo.set_status(document.id, 'processing')
+        return document
 
     async def save_file(self, workspace_id: int, file):
         upload_dir = Path(f'docs/{workspace_id}')
