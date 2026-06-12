@@ -1,16 +1,19 @@
 import numpy as np
 
-
-def min_max_norm(x):
-    return (x - min(x)) / (max(x) - min(x))
+# NORMALIZATION
 
 def l2_norm(v):
     return np.sqrt(np.sum(np.square(v)))
 
+def min_max_norm(v):
+    return (v - min(v)) / (max(v) - min(v))
+
+# COSINE SIMILARITY
+
 def cos_sim(v1, v2):
     return np.dot(v1, v2) / (l2_norm(v1) * l2_norm(v2))
 
-# bm 25
+# BM25
 
 def calc_term_frequency(query, data):
     res = {}
@@ -42,6 +45,7 @@ def calc_document_length_normalization(data):
     res /= len(data)
     return res
 
+
 def bm25(query, data):
     query = query.split(' ')
     chunks = [chunk.chunk for chunk in data]
@@ -64,4 +68,4 @@ def bm25(query, data):
     
         res[data[i].id] = score
     
-    return res            
+    return res   
